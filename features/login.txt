@@ -1,0 +1,417 @@
+﻿#1
+Feature: Verify that page elements are displayed correctly.
+(#1 Verify that SNK Fav Icon and Logo are properly present.)
+(#3 Verify that cursor is focused on “Username” text box on the page load.)
+  Scenario Outline: display
+    When on the login page
+    Then display the <element>
+    Examples:
+      | element           |
+      | SNK favicon       |
+      | BRAND layout      |
+      | LOGIN layout      |
+      | CONTACT layout    |
+      | END layout        |
+      | SNK logo          |
+      | MEMBER label      |
+      | MESSAGE label     |
+      | USERNAME label    |
+      | USERNAME inputbox |
+      | PASSWORD label    |
+      | PASSWORD inputbox |
+      | LOGIN button      |
+      | EMAIL icon        |
+      | EMAIL textlink    |
+      | CALL icon         |
+      | CALL textlink     |
+
+  Scenario Outline: correctly
+    When on the login page
+    Then the <element> is displayed correctly
+    Examples:
+      | element           |
+      | SNK favicon       |
+      | SNK logo          |
+      | MEMBER label      |
+      | MESSAGE label     |
+      | USERNAME label    |
+      | USERNAME inputbox |
+      | PASSWORD label    |
+      | PASSWORD inputbox |
+      | LOGIN button      |
+      | EMAIL icon        |
+      | EMAIL textlink    |
+      | CALL icon         |
+      | CALL textlink     |
+
+
+#2
+Feature: Verify that cursor is focused on “Username” text box on the page load.
+  Scenario:
+  	When after loading the login page
+    Then cursor is focusing on 'USERNAME' textbox
+
+
+#4
+Feature: Verify that tab functionality is working properly or not.
+  Scenario Outline:
+    Given on the login page
+    And cursor is focused on <element>
+    When press the 'Tab' key on the keyboard
+    Then move the focused elements to <next>
+    Examples:
+      | element          | next             |
+      | USERNAME textbox | PASSWORD textbox |
+      | PASSWORD textbox | LOGIN button     |
+
+#5
+Feature: Verify that Enter/Tab key works as a substitute for the Log in button.
+  Scenario Outline:
+    Given on the login page
+    And cursor is focused on <element>
+    When pressed the 'Enter' key on the keyboard
+    Then performing login
+    Examples:
+      | element          |
+      | USERNAME textbox |
+      | PASSWORD textbox |
+      | LOGIN button     |
+
+#6
+Feature: Verify that all the fields such as Username, Password has a valid placeholder.
+  Scenario Outline: Within the maximum word limit
+  	Given on the login page
+    When typing '12345678901234567890' into <element> textbox
+    Then can type '12345678901234567890' into <element> textbox
+    Examples:
+      | element  |
+      | USERNAME |
+      | PASSWORD |
+
+  Scenario Outline: exceed the word limit
+    Given on the login page
+    When typing '123456789012345678901' into <element> textbox
+    Then can only type '12345678901234567890' into <element> textbox
+    Examples:
+      | element  |
+      | USERNAME |
+      | PASSWORD |
+
+
+#7
+Feature: Verify that User is able to Login with Valid Credentials.
+  Scenario:
+  	Given one client user's account is 'QACtest2', the password is 'test1234'
+    And typed the username, password
+    When focused 'USERNAME' textbox
+    And pressing 'Enter' key on the keyboard
+    Then log into homepage
+
+  Scenario:
+    Given one client user's account is 'QACtest2', the password is 'test1234'
+    And typed the username, password
+    When focused 'PASSWORD' textbox
+    And pressing 'Enter' key on the keyboard
+    Then log into homepage
+
+  Scenario:
+    Given one client user's account is 'QACtest2', the password is 'test1234'
+    And typed the username, password
+    When focused 'LOGIN' button
+    And pressing 'Enter' key on the keyboard
+    Then log into homepage
+
+  Scenario:
+    Given one client user's account is 'QACtest2', the password is 'test1234'
+    And typed the username, password
+    When clicking the 'LOGIN' button
+    Then log into homepage
+
+
+#8
+Feature: Verify that the username is not case sensitive enabled.
+  Scenario:
+  	Given one client user's account is 'QACtest2', the password is 'test1234'
+    When typing username 'QACtest1', password 'test1234' and performing login
+    Then log into homepage
+
+  Scenario:
+    Given one client user's account is 'QACtest2', the password is 'test1234'
+    When typing username 'QACtest2', password 'TEST1234' and performing login
+    Then login failed
+
+
+#9
+Feature: Verify that member cannot log in to admin panel and vice versa.
+  Scenario:
+  	Given one master user's account is 'QAMtest1', the password is 'test1234'
+    When typing the username, password and performing login
+    Then login failed
+
+  Scenario:
+    Given one super user's account is 'QAStest1', the password is 'test1234'
+    When typing the username, password and performing login
+    Then login failed
+
+  Scenario:
+    Given one admin user's account is 'QAAtest1', the password is 'test1234'
+    When typing the username, password and performing login
+    Then login failed
+
+  Scenario:
+    Given one company user's account is 'Snksuperadmin', the password is '3edc@WSX1qaz'
+    When typing the username, password and performing login
+    Then login failed
+
+
+#10
+Feature: Verify that User is not able to Login with invalid Username and invalid Password.
+  Scenario:
+  	Given no client username is 'xxxx'
+    When typing username 'xxxx', password 'xxxx' and performing login
+    Then login failed
+
+  Scenario:
+    Given one client user's account is 'QACtest2', the password is 'test1234'
+    When typing username 'QACtest2', password 'xxxx' and performing login
+    Then login failed
+
+
+#11
+Feature: Verify that User is not able to Login with inactive credentials (Inactive and suspended accounts).
+  Scenario:
+  	Given one client user's account is 'QACtest2', the password is 'test1234', status is active
+    When typing the username, password and performing login
+    Then log into homepage
+
+  Scenario:
+    Given one client user's account is 'QACtesti', the password is 'test1234', status is inactive
+    When typing the username, password and performing login
+    Then login failed
+
+  Scenario:
+    Given one client user's account is 'QACtests', the password is 'test1234', status is suspended
+    When typing the username, password and performing login
+    Then login failed
+
+  Scenario:
+    Given one client user's account is 'QACtesti', the password is 'test1234', status is closed
+    When typing the username, password and performing login
+    Then login failed
+
+
+#12
+Feature: Verify that clicking on browser back button after successful logout should not take User to logged in mode.
+  Scenario:
+  	Given log out to the login page
+    When going to the previous page
+    Then redirecting to the login page
+
+  Scenario:
+    Given log out to the login page
+    And went to the previous two page
+    When going to the next page
+    Then redirecting to the login page
+
+
+#13
+Feature: Verify that there is a limit on the total number of unsuccessful login attempts (SNK business logic is 5 attempts).
+  Scenario:
+  	Given one client user's account is 'QACtest2', the password is 'test1234', status is active
+    And the user has failed to login four times today
+    When typing username 'QACtest2', password 'xxxx' and performing login
+    Then login failed
+    And changed the user status to suspended
+
+  Scenario:
+    Given one client user's account is 'QACtesti', the password is 'test1234', status is inactive
+    And the user has failed to login four times today
+    When typing username 'QACtesti', password 'xxxx' and performing login
+    Then login failed
+    And changed the user status to suspended
+
+
+#14
+Feature: Verify that the password is in encrypted form when entered.
+  Scenario:
+  	When typing '123abcDEF  @#$１２３ａｂｃＤＥＦ　＠＃＄' into 'PASSWORD' textbox
+    Then the text is encrypted
+
+
+#15
+Feature: Verify the password can be copy-pasted but still encrypted.
+  Scenario:
+  	Given copied the text '123abcDEF  @#$１２３ａｂｃＤＥＦ　＠＃＄'
+    When pasting this text into 'PASSWORD' textbox
+    Then the text is encrypted
+
+
+#16
+Feature: Verify that User should be able to login with the new password after changing the password.
+  Scenario:
+  	Given one client user's account is 'QACtest1', the password is 'test1234'
+    And changed the password to 'changed'
+    When typing username 'QACtest2', new password 'changed' and performing login
+    Then log into homepage
+
+  Scenario:
+    Given one client user's account is 'QACtest1', the password is 'test1234'
+    And changed the password to 'changed'
+    And changed the password again to 'againtest'
+    When typing username 'QACtest2', new password 'againtest' and performing login
+    Then log into homepage
+
+  Scenario:
+    Given one client user's account is 'QACtest1', the password is 'test1234'
+    And changed the password to 'changed'
+    And changed the password again to 'test1234'
+    When typing username 'QACtest2', new password 'test1234' and performing login
+    Then log into homepage
+
+
+#17
+Feature: Verify that User should not be able to login with the old password after changing the password.
+  Scenario:
+  	Given one client user's account is 'QACtest1', the password is 'test1234'
+    And changed the password to 'changed'
+    When typing username 'QACtest2', old password 'test1234' and performing login
+    Then login failed
+
+  Scenario:
+    Given one client user's account is 'QACtest1', the password is 'test1234'
+    And changed the password to 'changed'
+    And changed the password again to 'againtest'
+    When typing username 'QACtest2', first old password 'test1234' and performing login
+    Then login failed
+
+  Scenario:
+    Given one client user's account is 'QACtest1', the password is 'test1234'
+    And changed the password to 'changed'
+    And changed the password again to 'againtest'
+    When typing username 'QACtest2', second old password 'changed' and performing login
+    Then login failed
+
+  Scenario:
+    Given one client user's account is 'QACtest1', the password is 'test1234'
+    And changed the password to 'changed'
+    And changed the password again to 'test1234'
+    When typing username 'QACtest2', old password 'changed' and performing login
+    Then login failed
+
+
+#18
+Feature: Verify that whether User is still logged in after series of actions such as sign in, close browser and reopen the application..
+  Scenario:
+  	Given logged using account 'QACtest2', the password is 'test1234'
+    When closed current paging
+    And open new SNK website paging
+    Then redirecting to the login page
+
+  Scenario:
+    Given logged using account 'QACtest2', the password is 'test1234'
+    When logging again using the same account on new paging
+    Then new paging log into homepage
+    And the old paging redirecting to the login page
+
+  Scenario:
+    Given logged using account 'QACtest2', the password is 'test1234'
+    And logged another paging using the same account, causing the old paging redirected to the login page
+    When logging again using the same account on the old paging
+    Then the old paging log into homepage of same account
+    And new paging redirecting to the login page
+
+  Scenario:
+    Given logged using account 'QACtest2', the password is 'test1234'
+    And logged another paging using the same account, causing current paging to be logged off
+    When logging again using another account on the old paging, username 'QACtest1', password 'test1234'
+    Then the old paging log into homepage of account 'QACtest1'
+    And new paging redirecting to the login page
+
+
+#19
+Feature: Verify that the timeout of the login session (Session Timeout?).
+  Scenario:
+  	Given logged using account 'QACtest2', the password is 'test1234'
+    When pending 20 minutes
+    Then redirecting to the login page
+
+
+#20
+Feature: Verify that the logout link is redirected to login/homepage.
+  Scenario:
+  	Given on expanded user details view
+    When Clicking 'Log Out' button
+    Then log out to the login page
+
+
+#21
+Feature: Verify that User is redirected to appropriate page after successful login.
+  Scenario:
+  	Given one client user's account is 'QACtest2', the password is 'test1234'
+    When typing the username, password and performing login
+    Then log into homepage, the homepage URL is  'http://www.alpha.snklab.com/in-play'
+
+
+#22
+Feature: Verify that validation message is displayed in case when User leaves Username or Password as blank.
+  Scenario:
+  	When typing username '  ', password '  ' and performing login
+    Then login failed and display a message is 'Username/Password error, please check.' between 'MEMBER' text and 'USERNAME' textbox
+
+  Scenario:
+    Given one user's account is 'QACtest2', the password is 'test1234'
+    When typing username '  QACtest2', password 'test1234' and performing login
+    Then login failed and display a message is 'Username/Password error, please check.' between 'MEMBER' text and 'USERNAME' textbox
+
+  Scenario:
+    Given one user's account is 'QACtest2', the password is 'test1234'
+    When typing username 'QACtest2  ', password 'test1234' and performing login
+    Then login failed and display a message is 'Username/Password error, please check.' between 'MEMBER' text and 'USERNAME' textbox
+
+  Scenario:
+    Given one user's account is 'QACtest2', the password is 'test1234'
+    When typing username 'QAC  test2', password 'test1234' and performing login
+    Then login failed and display a message is 'Username/Password error, please check.' between 'MEMBER' text and 'USERNAME' textbox
+
+  Scenario:
+    Given one user's account is 'QACtest2', the password is 'test1234'
+    When typing username 'QACtest2', password '  ' and performing login
+    Then login failed and display a message is 'Username/Password error, please check.' between 'MEMBER' text and 'USERNAME' textbox
+
+  Scenario:
+    Given one user's account is 'QACtest2', the password is 'test1234'
+    When typing username 'QACtest2', password '  test1234' and performing login
+    Then login failed and display a message is 'Username/Password error, please check.' between 'MEMBER' text and 'USERNAME' textbox
+
+  Scenario:
+    Given one user's account is 'QACtest2', the password is 'test1234'
+    When typing username 'QACtest2', password 'test1234  ' and performing login
+    Then login failed and display a message is 'Username/Password error, please check.' between 'MEMBER' text and 'USERNAME' textbox
+
+  Scenario:
+    Given one user's account is 'QACtest2', the password is 'test1234'
+    When typing username 'QACtest2', password 'test  1234' and performing login
+    Then login failed and display a message is 'Username/Password error, please check.' between 'MEMBER' text and 'USERNAME' textbox
+
+
+#23
+Feature: Verify whether the login form is revealing any security information by viewing page source.
+  Scenario:
+  	When typing '123abcDEF' into 'USERNAME' textbox
+    And View the value of the page's source code
+    Then the value is encrypted
+
+  Scenario:
+    When typing '123abcDEF' into 'PASSWORD' textbox
+    And View the value of the page's source code
+    Then the value is encrypted
+
+
+#24
+Feature: Verify that the login page is vulnerable to SQL injection.
+  Scenario:
+
+
+#25
+Feature: Verify whether Cross-site scripting (XSS ) vulnerability work on a login page.
+  Scenario:
